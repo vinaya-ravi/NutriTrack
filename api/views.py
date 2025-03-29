@@ -63,16 +63,62 @@ def nutrition_summary(request):
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
-# View to provide food suggestions based on nutrient deficiencies (placeholder)
+# View to provide food suggestions based on nutrient deficiencies
 @csrf_exempt
 def suggestions(request):
     if request.method == 'GET':
-        # Placeholder response for food suggestions
-        # Replace this with actual logic to calculate deficiencies and suggest foods
-        sample_suggestions = [
-            {"food": "Spinach", "nutrient": "Vitamin A", "amount_per_serving": 100},
-            {"food": "Chicken Breast", "nutrient": "Protein", "amount_per_serving": 30},
-        ]
-        return JsonResponse(sample_suggestions, status=200)
+        try:
+            # Example of daily recommended values (can be dynamic based on user profile)
+            recommended_values = {
+                "calories": 2000,
+                "protein": 75,
+                "carbohydrates": 300,
+                "fats": 70,
+                "Vitamin A": 100,
+                "Vitamin C": 90,
+            }
+
+            # Example of current daily intake (replace with real aggregated data)
+            current_intake = {
+                "calories": 1500,
+                "protein": 50,
+                "carbohydrates": 200,
+                "fats": 60,
+                "Vitamin A": 50,
+                "Vitamin C": 30,
+            }
+
+            # Calculate deficiencies
+            deficiencies = {
+                nutrient: recommended_values[nutrient] - current_intake.get(nutrient, 0)
+                for nutrient in recommended_values
+                if recommended_values[nutrient] > current_intake.get(nutrient, 0)
+            }
+
+            # Fetch food suggestions for deficiencies using Nutritionix API
+            suggestions = []
+            for nutrient, deficiency in deficiencies.items():
+                url = "https://trackapi.nutritionix.com/v2/natural/nutrients"
+                headers = {
+                    "x-app-id": settings.NUTRITIONIX_APP_ID,
+                    "x-app-key": settings.NUTRITIONIX_APP_KEY,
+                    "Content-Type": "application/json",
+                }
+                query = f"foods high in {nutrient}"
+                response = requests.post(url, json={"query": query}, headers=headers)
+
+                if response.status_code == 200:
+                    foods = response.json().get("foods", [])
+                    for food in foods[:3]:  # Limit to top 3 suggestions per nutrient
+                        suggestions.append({
+                            "food_name": food["food_name"],
+                            "nutrient": nutrient,
+                            "amount_per_serving": food.get("nf_calories", None),
+                        })
+
+            return JsonResponse(suggestions, safe=False, status=200)
+
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
 
     return JsonResponse({"error": "Invalid request method"}, status=405)

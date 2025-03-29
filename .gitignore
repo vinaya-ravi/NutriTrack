@@ -1,2 +1,53 @@
-﻿env/
-db.sqlite3
+﻿# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Django-specific files
+*.log
+*.pot
+db.sqlite3  # Ignore the SQLite database file (optional, see note below)
+local_settings.py  # Ignore local settings if used
+
+# Environment variables
+.env  # Ignore environment variable files
+
+# Virtual environment folders
+env/
+venv/
+
+# IDE-specific files
+.idea/  # PyCharm project configuration directory
+.vscode/  # Visual Studio Code settings
+
+# macOS-specific files
+.DS_Store
+
+# Windows-specific files
+Thumbs.db
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# Testing-related files and folders
+.tox/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+
+# Packaging-related files and folders
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Temporary files and folders
+*.bak
+*.swp
+*.tmp
+
+# Migrations (optional, if you want to exclude them)
+#migrations/
+
